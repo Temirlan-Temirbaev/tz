@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { DocumentUseCase } from '../use-cases/document/document.use-case';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtGuard } from '../use-cases/auth/guards/jwt.guard';
@@ -19,12 +19,19 @@ export class DocumentController {
     return this.documentUseCase.uploadDocument(document, id);
   }
 
-  @Post("sign")
-  // @UseGuards(AdminGuard)
+  @Put("sign")
+  @UseGuards(AdminGuard)
   @UseInterceptors(FileInterceptor("p12File"))
   async signDocument(@Body() body: SignDocumentDto, @UploadedFile() signerDSK: Express.Multer.File) {
     return this.documentUseCase.signDocument(signerDSK, body);
   }
+
+  @Put("denie/:id")
+  @UseGuards(AdminGuard)
+  async denieDocument(@getUserId() user_id: string, @Param("id") id: string) {
+    return this.documentUseCase.denieDocument(user_id, +id);
+  }
+
   @Get("/page/:page")
   async getDocuments(@Param("page") page: string) {
     return this.documentUseCase.getDocuments(+page)

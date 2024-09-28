@@ -6,6 +6,7 @@ import { AuthUseCasesModule } from './use-cases/auth/auth.use-cases.module';
 import { DocumentController } from './controllers/document.controller';
 import { DocumentUseCasesModule } from './use-cases/document/document.use-cases.module';
 import { NotificationUseCasesModule } from './use-cases/notification/notification.use-cases.module';
+import { NotificationController } from './controllers/notification.controller';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { NotificationUseCasesModule } from './use-cases/notification/notificatio
   ],
   controllers: [
     AuthController,
-    DocumentController
+    DocumentController,
+    NotificationController
   ]
 })
 export class AppModule {

@@ -20,8 +20,9 @@ export class Document {
   @ManyToOne(() => User, user => user.accepted_documents, {nullable: true})
   accepter: User;
   @OneToOne(() => Notification, notification => notification.document, {nullable: true})
-  notification: Notification;
   @JoinColumn()
+  notification: Notification;
   @OneToOne(() => Signature, (signature) => signature.document, {nullable: true, cascade : true})
+  @JoinColumn()
   signature: Signature;
 }
