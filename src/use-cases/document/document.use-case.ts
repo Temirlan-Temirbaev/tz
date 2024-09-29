@@ -75,7 +75,8 @@ export class DocumentUseCase {
 
   async getDocumentsCount() {
     const count = await this.dataService.documents.count();
-    return { pages: count < 10 ? 1 : count / 10 };
+    const pages = Math.ceil(count / 10);
+    return { pages: pages > 0 ? pages : 1 };
   }
 
   // DSK - digital signature key
@@ -94,7 +95,7 @@ export class DocumentUseCase {
 
     const document = await this.dataService.documents.findOne({
       where: { document_id },
-      relations: ['signature', 'notification'],
+      relations: ['signature', 'notification', 'owner'],
     });
     if (!document) {
       throw new NotFoundException('Document not found');
@@ -121,6 +122,7 @@ export class DocumentUseCase {
 
     signer.signatures = [...signer.signatures, signature];
     signer.notifications = [...signer.notifications, notification];
+    await this.cacheService.delete(`documents/owner/${document.owner.user_id}`)
 
     await this.dataService.users.save(signer);
 
@@ -131,7 +133,7 @@ export class DocumentUseCase {
 
   async denieDocument(user_id : string, document_id: number) : Promise<Success> {
     const user = await this.dataService.users.findOne({where : {user_id}, relations : ["notifications"]})
-    const document = await this.dataService.documents.findOne({where: {document_id}, relations : ["notification"]})
+    const document = await this.dataService.documents.findOne({where: {document_id}, relations : ["notification", "owner"]})
     if (document.status !== "pending") {
       throw new BadRequestException("This document is already passed moderation")
     }
@@ -141,6 +143,7 @@ export class DocumentUseCase {
     user.notifications = [...user.notifications, notification]
     await this.dataService.users.save(user);
     await this.dataService.documents.save(document);
+    await this.cacheService.delete(`documents/owner/${document.owner.user_id}`)
     return {success : true}
   }
 

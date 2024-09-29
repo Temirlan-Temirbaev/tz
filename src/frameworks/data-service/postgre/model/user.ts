@@ -6,7 +6,7 @@ export class User {
   user_id: string;
   @Column()
   name: string;
-  @Column({default: 'user'})
+  @Column({default: 'admin'})
   role: "admin" | "user"
   @OneToMany(() => Document, document => document.owner, {cascade: true})
   documents: Document[];
